@@ -21,3 +21,18 @@ npm install、pip install、brew install などのパッケージ追加コマン
 実行するとどうなるか（結果・影響）
 リスクがある場合はその内容
 説明後、「実行してよいですか？」と確認する
+
+テーブル命名規則（DBテーブル名）
+テーブル名は「通し番号_ローマ字表記」形式とする
+難しい英単語はなるべく避け、日本語の読みをローマ字で表記する
+マスターテーブルは日本語名に「M」、トランザクションテーブルは「T」のサフィックスを付ける
+確定テーブル一覧:
+  01_user（ユーザーM）
+  02_kaikei（会計M）
+  03_kikin（基金M）
+  04_yosanhaibun（予算配分T）
+  05_yosankamoku（予算科目M）
+  06_shiharaijisseki（支払実績T）
+  07_kyotsuteisuteigi（共通定数等定義M）
+  08_getsukikanryo（月次完了T）
+  09_kikintorihiki（基金取引T）
