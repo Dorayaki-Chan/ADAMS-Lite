@@ -56,6 +56,8 @@
 | 07_kyotsuteisuteigi | 共通定数等定義M |
 | 08_getsukikanryo | 月次完了T |
 | 09_kikintorihiki | 基金取引T |
+| 10_gyojikeikaku | 行事計画M |
+| 11_gyojiyosanhaibun | 行事予算配分T |
 
 ---
 
