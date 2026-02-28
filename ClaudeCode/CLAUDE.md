@@ -36,3 +36,20 @@ npm install、pip install、brew install などのパッケージ追加コマン
   07_kyotsuteisuteigi（共通定数等定義M）
   08_getsukikanryo（月次完了T）
   09_kikintorihiki（基金取引T）
+
+## Git作業ルール
+
+### タスク完了時のcommit
+- ひとつのタスクが完了したら、必ずcommitすること
+- 未commitの変更を残したまま次のタスクに進まない
+- commitメッセージは日本語で、変更内容が分かるよう具体的に書く
+
+### ブランチ運用
+- Claudeが作業するブランチは claude/〇〇 形式とする
+- claude/〇〇 ブランチでの作業完了後は develop へマージすること
+- マージ後も claude/〇〇 ブランチは削除しない（履歴として残す）
+
+### commitに含めないもの
+- .claude/ フォルダ（Claudeの内部設定）
+- nul などのWindowsが誤生成したファイル
+- node_modules/ フォルダ
