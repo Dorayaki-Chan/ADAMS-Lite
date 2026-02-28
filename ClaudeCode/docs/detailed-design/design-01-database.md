@@ -137,8 +137,9 @@ WHERE budget_item_id = ? AND fiscal_year_id = ?
 | amount | DECIMAL(12,0) | NOT NULL | 金額 |
 | raw_category | VARCHAR(100) | NULL | CSV元の分類（参照用） |
 | note | TEXT | NULL | メモ |
+| source | ENUM('csv','discord','manual') | NOT NULL, DEFAULT 'csv' | 登録元（CSV取込 / Discord Bot / 手入力） |
 | status | ENUM('unassigned','assigned','confirmed') | NOT NULL, DEFAULT 'unassigned' | 割り振り状態 |
-| imported_at | DATETIME | NOT NULL | CSVインポート日時 |
+| registered_at | DATETIME | NOT NULL | 登録日時（CSVインポート日時・Discord投稿日時・手入力日時） |
 | created_at | DATETIME | NOT NULL | |
 | updated_at | DATETIME | NOT NULL | |
 

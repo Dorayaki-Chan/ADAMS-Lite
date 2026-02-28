@@ -14,6 +14,14 @@
 ├── nginx/
 │   └── nginx.conf
 │
+├── discord-bot/                   # Discord Bot（独立プロセス）
+│   ├── src/
+│   │   ├── commands/              # スラッシュコマンド定義（/setevent 等）
+│   │   ├── handlers/              # メッセージ処理・タイムアウト管理
+│   │   └── api/                   # ADAMS Lite API クライアント（axios 等）
+│   └── package.json
+│                                  # ※ DBに直接アクセスしない。REST API経由で書き込む
+│
 ├── frontend/                      # React SPA
 │   ├── src/
 │   │   ├── components/            # 共通UIコンポーネント

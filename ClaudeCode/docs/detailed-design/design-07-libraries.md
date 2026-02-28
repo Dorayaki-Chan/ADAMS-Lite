@@ -33,3 +33,30 @@
     ↓
 [Browser] ファイルダウンロード
 ```
+
+---
+
+### 7.2 Discord連携
+
+| 用途 | ライブラリ | バージョン管理 | ライセンス | 実行場所 |
+|---|---|---|---|---|
+| Discord Bot | **discord.js** | discord-bot/package.json | Apache-2.0（無料） | discord-bot コンテナ（Docker Compose内） |
+
+**Discord Bot の実装方針**:
+- `discord.js` の最新版を使用してスラッシュコマンド（`/setevent`）とメッセージイベントを実装する
+- BotはDocker Compose内の独立コンテナとして起動する（自宅UGREEN NAS上で他サービスと一元管理）
+- ADAMS Lite バックエンドへの書き込みは、`axios` 等の HTTPクライアントで `POST /api/v1/actuals/discord`（APIキー認証）を呼び出す。DBへの直接アクセスは行わない
+
+**連携フロー**:
+```
+[Discord] ユーザーがスレッド内に「金額 メモ」を投稿
+    ↓
+[discord-bot] discord.js でメッセージを受信・パース
+    ↓
+[discord-bot] axios で POST /api/v1/actuals/discord を呼び出し
+              ヘッダー: x-api-key: <APIキー>
+    ↓
+[backend] 06_shiharaijisseki に source='discord' で INSERT
+    ↓
+[discord-bot] 登録完了をDiscordに返信
+```
