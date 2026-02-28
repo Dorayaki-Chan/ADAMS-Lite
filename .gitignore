@@ -2,3 +2,5 @@
 **/ndlocr-lite
 **/*.env
 **/materials
+
+**/settings.local.json
