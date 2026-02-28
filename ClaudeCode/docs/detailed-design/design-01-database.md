@@ -1,6 +1,6 @@
 # 詳細設計書 - データベース設計
 
-> **プロジェクト**: ADAMS Lite | **最終更新**: 2026-02-27
+> **プロジェクト**: ADAMS Lite | **最終更新**: 2026-02-28
 > **← [目次に戻る](../index.md)**
 
 ---
@@ -20,8 +20,12 @@
         ├──< 05_yosankamoku（予算科目M ※自己参照ツリー）
         │      └──< 04_yosanhaibun（予算配分T: 当初/補正/暫定）
         ├──< 06_shiharaijisseki（支払実績T）
-        │      └── 05_yosankamoku（割り振り先、nullable）
-        └──< 08_getsukikanryo（月次完了T）
+        │      ├── 05_yosankamoku（割り振り先、nullable）
+        │      └── 10_gyojikeikaku（行事紐付け・事項、nullable）
+        ├──< 08_getsukikanryo（月次完了T）
+        └──< 10_gyojikeikaku（行事計画M）
+               └──< 11_gyojiyosanhaibun（行事予算配分T）
+                      └── 05_yosankamoku（対象科目・目レベル）
 
 03_kikin（基金M）
  └──< 09_kikintorihiki（基金取引T）
@@ -115,7 +119,8 @@ WHERE budget_item_id = ? AND fiscal_year_id = ?
 ```
 > **amount=NULL**: 未設定（CSVで予算額が空白だったもの）。SUM は NULL を自動無視するため集計に影響なし。
 > **amount=0**: 明示的な0円。集計対象。
-> **款レベル参考値**: UI上は「参考: ○○円」として表示。执行率・残額の計算には含めない。
+> **款レベル参考値**: UI上は「参考: ○○円」として表示。執行率・残額の計算には含めない。
+> **事項あり目の予算額（積算方式 / 案A採用）**: `11_gyojiyosanhaibun` にレコードが存在する目（事項あり目）の予算額は `SUM(11_gyojiyosanhaibun.amount WHERE budget_item_id = 対象目)` から自動計算する。当該目の `04_yosanhaibun` レコードは作成しない（国の予算書と同様、事項合計 = 目合計）。事項なしの目（食費・住居費等）は従来どおり `04_yosanhaibun` を直接設定する。
 
 ---
 
@@ -126,6 +131,7 @@ WHERE budget_item_id = ? AND fiscal_year_id = ?
 | id | INT | PK, AUTO_INCREMENT | |
 | fiscal_year_id | INT | FK → 02_kaikei.id | |
 | budget_item_id | INT | FK → 05_yosankamoku.id, NULL | 割り振り先科目（未割当はNULL） |
+| event_id | INT | FK → 10_gyojikeikaku.id, NULL | 紐付け行事（事項）。NULL=事項なし |
 | direction | ENUM('revenue','expenditure') | NOT NULL | 歳入 / 歳出 |
 | date | DATE | NOT NULL | 収支日 |
 | amount | DECIMAL(12,0) | NOT NULL | 金額 |
@@ -185,6 +191,47 @@ WHERE budget_item_id = ? AND fiscal_year_id = ?
 | created_at | DATETIME | NOT NULL | |
 
 > **方式B統一**: 積立は一般会計の歳出実績と、取崩は特別会計の歳入実績と紐付ける。
+
+---
+
+#### 10_gyojikeikaku（行事計画M）
+
+| カラム名 | 型 | 制約 | 説明 |
+|---|---|---|---|
+| id | INT | PK, AUTO_INCREMENT | |
+| fiscal_year_id | INT | FK → 02_kaikei.id | 年度 |
+| name | VARCHAR(100) | NOT NULL | 行事名（例: 社会科見学、弱男定例会） |
+| type | ENUM('event','purpose') | NOT NULL | event: 旅行等大規模行事 / purpose: 繰り返し小目的 |
+| start_date | DATE | NULL | 開始日（主に event 型。日帰りは end_date と同日） |
+| end_date | DATE | NULL | 終了日 |
+| status | ENUM('planned','tentative','active','completed') | NOT NULL, DEFAULT 'planned' | 計画中 / 仮押さえ / 実行中 / 完了 |
+| description | TEXT | NULL | 備考 |
+| created_at | DATETIME | NOT NULL | |
+| updated_at | DATETIME | NOT NULL | |
+
+> **type='event'**: 旅行・コンサート等、日程が決まっている大型行事。start_date / end_date を持つ。
+> **type='purpose'**: 弱男定例会等、日程によらず繰り返す小目的。実績に「目的」ラベルとして付与するために使用。
+
+---
+
+#### 11_gyojiyosanhaibun（行事予算配分T）
+
+| カラム名 | 型 | 制約 | 説明 |
+|---|---|---|---|
+| id | INT | PK, AUTO_INCREMENT | |
+| event_id | INT | FK → 10_gyojikeikaku.id | 対象行事（事項） |
+| budget_item_id | INT | FK → 05_yosankamoku.id | 対象予算科目（目レベル） |
+| amount | DECIMAL(12,0) | NULL | 予算額（事項×目の組み合わせ単位） |
+| description | VARCHAR(200) | NULL | 備考 |
+| created_at | DATETIME | NOT NULL | |
+| updated_at | DATETIME | NOT NULL | |
+
+**インデックス**: `(event_id, budget_item_id)` UNIQUE
+
+> このテーブルが「目 × 事項」マトリクスの予算を保持する中核。
+> 例: 社会科見学(event_id=1) × 旅行関係費>交通費(budget_item_id=X) = 15,000円
+> 帳票出力の2形式（科目別・事項別）はいずれもこのテーブルを参照して事項行を展開する。
+> **積算方式（案A採用）**: 同一 budget_item_id（目）に複数の事項が紐付く場合、その目の予算額は `SUM(amount) WHERE budget_item_id = 対象目` で求める。`04_yosanhaibun` には当該目の予算は登録しない。
 
 ---
 
