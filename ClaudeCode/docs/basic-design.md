@@ -36,7 +36,7 @@
 │                      │  モジュラーモノリス構成          │  │
 │                      │  ├─ budget（予算管理）           │  │
 │                      │  ├─ closing（決算管理）          │  │
-│                      │  ├─ travel（旅費）               │  │
+│                      │  ├─ events（行事計画）           │  │
 │                      │  ├─ funds（基金）                │  │
 │                      │  ├─ reports（報告書）            │  │
 │                      │  └─ shared（共通）               │  │
@@ -98,7 +98,7 @@
 | ORM | Prisma | 6 | 型安全なDB操作 |
 | データベース | MySQL | 8.0 | |
 | 認証 | JWT | - | アクセス + リフレッシュトークン |
-| PDF出力 | 未定 | - | 実装フェーズで選定 |
+| PDF出力 | @react-pdf/renderer（MIT） | - | req-03で確定済み |
 | Excel出力 | ExcelJS 等 | - | 実装フェーズで選定 |
 | インフラ | Docker Compose | - | 自宅サーバー運用 |
 | リバースプロキシ | nginx | alpine | HTTPS終端 |
@@ -125,9 +125,9 @@
 | 予算執行状況 | `/reports/execution` | 予算・実績・補正後・執行率の一覧表 |
 | 月次報告書 | `/reports/monthly` | 月次帳票（画面/PDF/Excel） |
 | 年度報告書 | `/reports/annual` | 年度帳票（画面/PDF/Excel） |
-| **旅費** | | |
-| 旅行計画 | `/travel/plan` | 旅行計画の作成・管理（要件確認中） |
-| 旅費精算 | `/travel/expense` | 旅費の精算処理（要件確認中） |
+| **行事計画** | | |
+| 行事計画 | `/events/plan` | 行事計画の作成・管理（要件確認中） |
+| 旅費精算 | `/events/expense` | 旅費の精算処理（要件確認中） |
 | **基金** | | |
 | 基金管理 | `/funds` | 基金一覧・残高確認 |
 | 基金取引 | `/funds/:id` | 積立・取崩の記録 |
