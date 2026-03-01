@@ -29,13 +29,6 @@ npm install、pip install、brew install などのパッケージ追加コマン
 確定テーブル一覧:
   01_user（ユーザーM）
   02_kaikei（会計M）
-  03_kikin（基金M）
-  04_yosanhaibun（予算配分T）
-  05_yosankamoku（予算科目M）
-  06_shiharaijisseki（支払実績T）
-  07_kyotsuteisuteigi（共通定数等定義M）
-  08_getsukikanryo（月次完了T）
-  09_kikintorihiki（基金取引T）
 
 ## Git作業ルール
 
