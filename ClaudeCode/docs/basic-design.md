@@ -266,43 +266,14 @@
 
 ## 6. 行事計画モジュール設計
 
-> req-04（行事・旅費要件）確定に基づく設計。指摘No.2対応。
+> req-04（行事・旅費要件）確定に基づく設計。カラム詳細は詳細設計書（docs/detailed-design.md）を参照。
 
-### DBテーブル
+### DBテーブル（概要）
 
 命名規則: `通し番号_ローマ字表記`（マスターM・トランザクションT）
 
-#### 03_gyoji（行事M）
-
-| カラム名 | 型 | 説明 |
+| テーブル名 | 種別 | 概要 |
 |---|---|---|
-| id | INT PK | |
-| kaikei_id | INT FK | 会計年度ID |
-| name | VARCHAR | 行事名 |
-| type | ENUM | `event`（行事）/ `purpose`（目的別） |
-| start_date | DATE | 開始日 |
-| end_date | DATE | 終了日 |
-| status | ENUM | `keikakuchu`（計画中）/ `kariosaeChu`（仮押さえ中）/ `jikkochu`（実行中）/ `kanryo`（完了） |
-| memo | TEXT | 備考 |
-
-#### 04_shiharaikeikaku（支払計画T）
-
-| カラム名 | 型 | 説明 |
-|---|---|---|
-| id | INT PK | |
-| gyoji_id | INT FK | 行事ID |
-| yoteibi | DATE | 支払予定日 |
-| kingaku | DECIMAL | 金額 |
-| naiyou | VARCHAR | 支払内容 |
-| shiharaite | VARCHAR | 支払先 |
-| actual_id | INT FK NULL | 実績紐付け後に設定 |
-
-#### 05_gyojihaibun（行事予算配分T）
-
-| カラム名 | 型 | 説明 |
-|---|---|---|
-| id | INT PK | |
-| gyoji_id | INT FK | 行事ID |
-| budget_item_id | INT FK | 予算科目ID |
-| kingaku | DECIMAL | 配分金額 |
-| henkoukubun | ENUM | `nashi`（変更なし）/ `bunkatsu`（分割）/ `ryuyo`（流用）/ `shinki`（新規） |
+| 03_gyoji | M | 行事。kaikei_id（会計年度）に紐付く。type（event/purpose）・status管理 |
+| 04_shiharaikeikaku | T | 行事ごとの支払計画。実績紐付け（actual_id）後に確定 |
+| 05_gyojihaibun | T | 行事ごとの予算配分。変更区分（なし/分割/流用/新規）を持つ |
