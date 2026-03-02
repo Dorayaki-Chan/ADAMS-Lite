@@ -8,12 +8,13 @@
 ## ドキュメント一覧
 
 ### 基本設計書
-- [basic-design.md](./basic-design.md) — システム全体のアーキテクチャ・技術選定・ページ構成・API設計・行事計画モジュール設計
+- [basic-design.md](./02_basic-designs/basic-design.md) — システム全体のアーキテクチャ・技術選定・ページ構成・API設計・行事計画モジュール設計
 
 ---
 
 ### 詳細設計書
-- [detailed-design.md](./detailed-design.md)（詳細設計フェーズで作成） — 全モジュールのDB設計・カラム定義
+DBテーブル設計書、画面設計書など、各モジュールごとに分割して作成予定
+<!-- 格納場所 03_detailed-designs -->
 
 ---
 
@@ -21,13 +22,13 @@
 
 | ファイル | 内容 |
 |---|---|
-| [req-01-overview.md](./requirements/req-01-overview.md) | システム概要・利用者・認証・会計制度 |
-| [req-02-yosan.md](./requirements/req-02-yosan.md) | 予算管理モジュール（科目体系・CSV・割り振り画面） |
-| [req-03-kessan.md](./requirements/req-03-kessan.md) | 決算管理モジュール（月次締め・年度締め・報告書） |
-| [req-04-ryoko.md](./requirements/req-04-ryoko.md) | 旅行計画モジュール（行事計画・仮押さえ） |
-| [req-05-ryohi.md](./requirements/req-05-ryohi.md) | 旅費精算モジュール（割り振り画面統合） |
-| [req-06-genkin.md](./requirements/req-06-genkin.md) | 現金精算即時連携モジュール（Discord連携） |
-| [req-07-misc.md](./requirements/req-07-misc.md) | データ移行・非機能要件・未決定事項 |
+| [req-01-overview.md](./01_requirements/req-01-overview.md) | システム概要・利用者・認証・会計制度 |
+| [req-02-yosan.md](./01_requirements/req-02-yosan.md) | 予算管理モジュール（科目体系・CSV・割り振り画面） |
+| [req-03-kessan.md](./01_requirements/req-03-kessan.md) | 決算管理モジュール（月次締め・年度締め・報告書） |
+| [req-04-ryoko.md](./01_requirements/req-04-ryoko.md) | 旅行計画モジュール（行事計画・仮押さえ） |
+| [req-05-ryohi.md](./01_requirements/req-05-ryohi.md) | 旅費精算モジュール（割り振り画面統合） |
+| [req-06-genkin.md](./01_requirements/req-06-genkin.md) | 現金精算即時連携モジュール（Discord連携） |
+| [req-07-misc.md](./01_requirements/req-07-misc.md) | データ移行・非機能要件・未決定事項 |
 
 ---
 
@@ -35,7 +36,7 @@
 
 `通し番号_ローマ字表記`（マスターM / トランザクションT）
 
-| テーブル名 | 内容 |
+| 物理名 | 論理名 |
 |---|---|
 | 01_user | ユーザーM |
 | 02_kaikei | 会計M |
