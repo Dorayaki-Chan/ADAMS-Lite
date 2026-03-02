@@ -1,7 +1,7 @@
 # 基本設計書
 
 **プロジェクト**: ADAMS Lite
-**最終更新**: 2026-02-26
+**最終更新**: 2026-03-02
 
 ---
 
@@ -12,6 +12,7 @@
 3. [技術スタック](#3-技術スタック)
 4. [ページ構成](#4-ページ構成)
 5. [API設計](#5-api設計)
+6. [行事計画モジュール設計](#6-行事計画モジュール設計)
 
 ---
 
@@ -113,7 +114,7 @@
 
 | ページ名 | パス | 概要 |
 |---|---|---|
-| ホーム | `/` | 今月の予算実績サマリー・未締めアラート |
+| ホーム | `/` | 今月の予算実績サマリー・未締めアラート・進行中行事ウィジェット |
 | **予算管理** | | |
 | 予算科目管理 | `/budget/items` | CSVインポート・科目ツリー表示・編集 |
 | 実績割り振り | `/budget/assign` | 実績D&D割り振り画面（メイン操作画面） |
@@ -126,8 +127,9 @@
 | 月次報告書 | `/reports/monthly` | 月次帳票（画面/PDF/Excel） |
 | 年度報告書 | `/reports/annual` | 年度帳票（画面/PDF/Excel） |
 | **行事計画** | | |
-| 行事計画 | `/events/plan` | 行事計画の作成・管理（要件確認中） |
-| 旅費精算 | `/events/expense` | 旅費の精算処理（要件確認中） |
+| 行事一覧 | `/events/plan` | 行事（event/purpose）の登録・管理・予算配分・仮押さえ確認 |
+| 行事詳細 | `/events/plan/:id` | 予算配分・支払計画・実績紐付け状況 |
+| ※旅費精算 | ~~`/events/expense`~~ | 独立ページなし。実績割り振り画面（`/budget/assign`）に行事フィルタで統合 |
 | **基金** | | |
 | 基金管理 | `/funds` | 基金一覧・残高確認 |
 | 基金取引 | `/funds/:id` | 積立・取崩の記録 |
@@ -178,6 +180,12 @@
 | POST | `/fiscal-years` | 会計年度作成 |
 | GET | `/fiscal-years/:id` | 会計年度詳細 |
 | PUT | `/fiscal-years/:id` | 会計年度更新 |
+
+### ダッシュボード
+
+| メソッド | パス | 概要 |
+|---|---|---|
+| GET | `/fiscal-years/:fyId/dashboard` | ホーム画面表示用。当月予算実績サマリー・進行中行事ウィジェットデータを返す |
 
 ### 予算科目
 
@@ -236,4 +244,65 @@
 | GET | `/funds` | 基金一覧 |
 | POST | `/funds` | 基金作成 |
 | GET | `/funds/:id` | 基金詳細・残高 |
+| GET | `/funds/:id/transactions` | 取引履歴一覧（フィルタ・ページング） |
 | POST | `/funds/:id/transactions` | 積立・取崩の記録 |
+
+### 行事計画
+
+| メソッド | パス | 概要 |
+|---|---|---|
+| GET | `/events` | 行事一覧 |
+| POST | `/events` | 行事登録 |
+| GET | `/events/:id` | 行事詳細 |
+| PUT | `/events/:id` | 行事更新 |
+| PATCH | `/events/:id/status` | ステータス更新 |
+| GET | `/events/:id/payment-plans` | 支払計画一覧 |
+| POST | `/events/:id/payment-plans` | 支払計画登録 |
+| PATCH | `/events/:id/payment-plans/:planId/link` | 実績紐付け |
+| GET | `/events/:id/budget-allocations` | 予算配分一覧 |
+| POST | `/events/:id/budget-allocations` | 予算配分登録 |
+
+---
+
+## 6. 行事計画モジュール設計
+
+> req-04（行事・旅費要件）確定に基づく設計。指摘No.2対応。
+
+### DBテーブル
+
+命名規則: `通し番号_ローマ字表記`（マスターM・トランザクションT）
+
+#### 03_gyoji（行事M）
+
+| カラム名 | 型 | 説明 |
+|---|---|---|
+| id | INT PK | |
+| kaikei_id | INT FK | 会計年度ID |
+| name | VARCHAR | 行事名 |
+| type | ENUM | `event`（行事）/ `purpose`（目的別） |
+| start_date | DATE | 開始日 |
+| end_date | DATE | 終了日 |
+| status | ENUM | `keikakuchu`（計画中）/ `kariosaeChu`（仮押さえ中）/ `jikkochu`（実行中）/ `kanryo`（完了） |
+| memo | TEXT | 備考 |
+
+#### 04_shiharaikeikaku（支払計画T）
+
+| カラム名 | 型 | 説明 |
+|---|---|---|
+| id | INT PK | |
+| gyoji_id | INT FK | 行事ID |
+| yoteibi | DATE | 支払予定日 |
+| kingaku | DECIMAL | 金額 |
+| naiyou | VARCHAR | 支払内容 |
+| shiharaite | VARCHAR | 支払先 |
+| actual_id | INT FK NULL | 実績紐付け後に設定 |
+
+#### 05_gyojihaibun（行事予算配分T）
+
+| カラム名 | 型 | 説明 |
+|---|---|---|
+| id | INT PK | |
+| gyoji_id | INT FK | 行事ID |
+| budget_item_id | INT FK | 予算科目ID |
+| kingaku | DECIMAL | 配分金額 |
+| henkoukubun | ENUM | `nashi`（変更なし）/ `bunkatsu`（分割）/ `ryuyo`（流用）/ `shinki`（新規） |
